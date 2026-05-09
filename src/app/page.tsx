@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma'
 import { ProductCard } from '@/components/product/product-card'
 import { Button } from '@/components/ui/button'
 
+export const dynamic = 'force-dynamic'
+
 interface ProductType {
   id: string
   brand: string
