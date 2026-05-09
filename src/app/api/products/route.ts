@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/prisma'
 
 export async function GET(request: Request) {
   try {
+    const prisma = await createPrismaClient()
+
     const { searchParams } = new URL(request.url)
 
     const brands = searchParams.get('brands')?.split(',').filter(Boolean)

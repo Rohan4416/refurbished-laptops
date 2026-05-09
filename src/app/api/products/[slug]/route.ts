@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/prisma'
 
 export async function GET(
   request: Request,
@@ -13,11 +13,11 @@ export async function GET(
 
     let product
     if (isId) {
-      product = await prisma.product.findUnique({
+      product = await (await createPrismaClient()).product.findUnique({
         where: { id: slug },
       })
     } else {
-      product = await prisma.product.findUnique({
+      product = await (await createPrismaClient()).product.findUnique({
         where: { slug },
       })
     }

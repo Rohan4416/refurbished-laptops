@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CartDrawer } from "@/components/layout/cart-drawer";
 import { Providers } from "@/components/providers";
 import { Toaster } from "react-hot-toast";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "RefurbTech - Certified Refurbished Laptops",
@@ -30,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${inter.variable} h-full font-sans antialiased bg-white text-slate-900 flex flex-col`}>
+      <body className="h-full font-sans antialiased bg-white text-slate-900 flex flex-col">
         <Providers>
           <Header />
           <main className="flex-1">

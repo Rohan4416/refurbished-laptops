@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/prisma'
 
 export async function GET(request: Request) {
   try {
@@ -17,13 +17,13 @@ export async function GET(request: Request) {
     }
 
     const [products, total] = await Promise.all([
-      prisma.product.findMany({
+      (await createPrismaClient()).product.findMany({
         where,
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
       }),
-      prisma.product.count({ where }),
+      (await createPrismaClient()).product.count({ where }),
     ])
 
     return NextResponse.json({
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     // Generate slug
     const slug = `${brand.toLowerCase()}-${model.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`
 
-    const product = await prisma.product.create({
+    const product = await (await createPrismaClient()).product.create({
       data: {
         brand,
         model,

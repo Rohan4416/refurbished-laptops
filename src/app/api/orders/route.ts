@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/prisma'
 
 export async function GET() {
   try {
@@ -13,7 +13,7 @@ export async function GET() {
 
     const userId = (session.user as {id?: string}).id
 
-    const orders = await prisma.order.findMany({
+    const orders = await (await createPrismaClient()).order.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
 
     // Create order with items
-    const order = await prisma.order.create({
+    const order = await (await createPrismaClient()).order.create({
       data: {
         userId,
         orderNumber,
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
 
     // Update stock quantities
     for (const item of items) {
-      await prisma.product.update({
+      await (await createPrismaClient()).product.update({
         where: { id: item.productId },
         data: {
           stockQuantity: {
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
     }
 
     // Clear user's cart
-    await prisma.cartItem.deleteMany({
+    await (await createPrismaClient()).cartItem.deleteMany({
       where: { userId },
     })
 

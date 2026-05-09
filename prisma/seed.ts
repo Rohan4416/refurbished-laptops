@@ -1,17 +1,11 @@
 import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
-import { Pool } from 'pg'
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
 import bcrypt from 'bcryptjs'
+import path from 'path'
 
-const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL
-
-if (!connectionString) {
-  throw new Error('Missing DATABASE_URL or POSTGRES_URL environment variable')
-}
-
-const pool = new Pool({ connectionString })
-const adapter = new PrismaPg(pool)
+const dbPath = path.join(process.cwd(), 'dev.db')
+const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` })
 const prisma = new PrismaClient({ adapter })
 
 async function seed() {

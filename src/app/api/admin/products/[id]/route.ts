@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/prisma'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const product = await prisma.product.findUnique({ where: { id } })
+    const product = await (await createPrismaClient()).product.findUnique({ where: { id } })
 
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
@@ -38,7 +38,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (body.stockQuantity !== undefined) updateData.stockQuantity = parseInt(body.stockQuantity)
     if (body.batteryHealth !== undefined) updateData.batteryHealth = parseInt(body.batteryHealth)
 
-    const product = await prisma.product.update({
+    const product = await (await createPrismaClient()).product.update({
       where: { id },
       data: updateData,
     })
@@ -56,7 +56,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    await prisma.product.delete({ where: { id } })
+    await (await createPrismaClient()).product.delete({ where: { id } })
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting product:', error)

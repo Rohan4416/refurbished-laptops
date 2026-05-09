@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/prisma'
 
 export async function GET(request: Request) {
   try {
@@ -8,13 +8,13 @@ export async function GET(request: Request) {
     const limit = 10
 
     const [orders, total] = await Promise.all([
-      prisma.order.findMany({
+      (await createPrismaClient()).order.findMany({
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
         include: { user: { select: { name: true, email: true } } },
       }),
-      prisma.order.count(),
+      (await createPrismaClient()).order.count(),
     ])
 
     return NextResponse.json({

@@ -1,6 +1,6 @@
 import NextAuth, { AuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: AuthOptions = {
@@ -16,7 +16,7 @@ export const authOptions: AuthOptions = {
           throw new Error('Email and password are required')
         }
 
-        const user = await prisma.user.findUnique({
+        const user = await (await createPrismaClient()).user.findUnique({
           where: { email: credentials.email },
         })
 

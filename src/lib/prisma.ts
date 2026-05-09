@@ -1,20 +1,33 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
-import { Pool } from 'pg'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-// Use POSTGRES_URL (Vercel) or DATABASE_URL (local)
-const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL
+export async function createPrismaClient(): Promise<PrismaClient> {
+  if (globalForPrisma.prisma) return globalForPrisma.prisma
 
-if (!connectionString) {
-  throw new Error('Missing DATABASE_URL or POSTGRES_URL environment variable')
+  const usePostgres = !!process.env.VERCEL || !!process.env.POSTGRES_URL
+
+  let client: PrismaClient
+
+  if (usePostgres) {
+    const { PrismaPg } = await import('@prisma/adapter-pg')
+    const { Pool } = await import('pg')
+    const pool = new Pool({ connectionString: process.env.POSTGRES_URL! })
+    const adapter = new PrismaPg(pool)
+    client = new PrismaClient({ adapter } as any)
+  } else {
+    const { PrismaBetterSqlite3 } = await import('@prisma/adapter-better-sqlite3')
+    const path = await import('path')
+    const dbPath = path.join(process.cwd(), 'dev.db')
+    const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` })
+    client = new PrismaClient({ adapter } as any)
+  }
+
+  globalForPrisma.prisma = client
+  return client
 }
 
-const pool = new Pool({ connectionString })
-const adapter = new PrismaPg(pool)
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter })
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+// Default export - call createPrismaClient() before using
+export const prisma = null as unknown as PrismaClient

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/prisma'
 
 export async function GET(request: Request) {
   try {
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
       : {}
 
     const [users, totalUsers] = await Promise.all([
-      prisma.user.findMany({
+      (await createPrismaClient()).user.findMany({
         where,
         skip,
         take: limit,
@@ -44,7 +44,7 @@ export async function GET(request: Request) {
           },
         },
       }),
-      prisma.user.count({ where }),
+      (await createPrismaClient()).user.count({ where }),
     ])
 
     return NextResponse.json({
@@ -78,7 +78,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
     }
 
-    const user = await prisma.user.update({
+    const user = await (await createPrismaClient()).user.update({
       where: { id: userId },
       data: { role },
       select: {
