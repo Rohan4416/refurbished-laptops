@@ -4,6 +4,7 @@ import { FiShield, FiRefreshCw, FiTruck, FiHeadphones, FiCheck } from 'react-ico
 import { prisma } from '@/lib/prisma'
 import { ProductCard } from '@/components/product/product-card'
 import { Button } from '@/components/ui/button'
+import { Product } from '@prisma/client'
 
 async function getFeaturedProducts() {
   const products = await prisma.product.findMany({
@@ -143,7 +144,7 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
+            {featuredProducts.map((product: Product) => (
               <ProductCard key={product.id} product={product as any} />
             ))}
           </div>
@@ -198,7 +199,7 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {latestProducts.map((product) => (
+            {latestProducts.map((product: Product) => (
               <ProductCard key={product.id} product={product as any} />
             ))}
           </div>
