@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { use } from 'react'
 import Link from 'next/link'
 import { FiArrowLeft, FiSave } from 'react-icons/fi'
 import { Button } from '@/components/ui/button'
 import { Input, Select, Textarea } from '@/components/ui/input'
+import { ImageUpload } from '@/components/ui/image-upload'
 import toast from 'react-hot-toast'
 
 const conditionOptions = [
@@ -37,13 +39,38 @@ const warrantyOptions = [
   { value: '2 Years', label: '2 Years' },
 ]
 
-export default function ProductFormPage() {
+interface ProductFormData {
+  brand: string
+  model: string
+  processor: string
+  processorBrand: string
+  ram: string
+  storage: string
+  displaySize: string
+  conditionGrade: string
+  batteryHealth: string
+  price: string
+  originalPrice: string
+  stockQuantity: string
+  warranty: string
+  description: string
+  images: string[]
+  featured: boolean
+  isPublished: boolean
+}
+
+interface PageProps {
+  params: Promise<{ id: string }>
+}
+
+export default function ProductFormPage({ params }: PageProps) {
   const router = useRouter()
-  const params = useParams()
-  const isEditing = !!params.id
+  const { id } = use(params)
+  const isEditing = !!id
 
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
+  const [fetchingProduct, setFetchingProduct] = useState(isEditing)
+  const [formData, setFormData] = useState<ProductFormData>({
     brand: '',
     model: '',
     processor: '',
@@ -58,10 +85,62 @@ export default function ProductFormPage() {
     stockQuantity: '',
     warranty: '1 Year',
     description: '',
-    images: '',
+    images: [],
     featured: false,
     isPublished: true,
   })
+
+  useEffect(() => {
+    if (isEditing && id) {
+      fetchProduct(id)
+    }
+  }, [isEditing, id])
+
+  const fetchProduct = async (productId: string) => {
+    try {
+      setFetchingProduct(true)
+      const res = await fetch(`/api/admin/products/${productId}`)
+
+      if (res.ok) {
+        const product = await res.json()
+
+        if (product && product.id) {
+          const images = Array.isArray(product.images)
+            ? product.images
+            : (typeof product.images === 'string' ? JSON.parse(product.images) : [])
+
+          setFormData({
+            brand: product.brand || '',
+            model: product.model || '',
+            processor: product.processor || '',
+            processorBrand: product.processorBrand || 'Intel',
+            ram: product.ram || '',
+            storage: product.storage || '',
+            displaySize: product.displaySize || '',
+            conditionGrade: product.conditionGrade || 'EXCELLENT',
+            batteryHealth: product.batteryHealth?.toString() || '',
+            price: product.price?.toString() || '',
+            originalPrice: product.originalPrice?.toString() || '',
+            stockQuantity: product.stockQuantity?.toString() || '',
+            warranty: product.warranty || '1 Year',
+            description: product.description || '',
+            images: images,
+            featured: product.featured || false,
+            isPublished: product.isPublished ?? true,
+          })
+        }
+      } else {
+        toast.error('Failed to load product')
+        router.push('/admin/products')
+      }
+    } catch (error) {
+      console.error('Error fetching product:', error)
+      toast.error('Failed to load product')
+      router.push('/admin/products')
+    } finally {
+      setFetchingProduct(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,10 +153,9 @@ export default function ProductFormPage() {
         price: parseFloat(formData.price),
         originalPrice: parseFloat(formData.originalPrice),
         stockQuantity: parseInt(formData.stockQuantity),
-        images: formData.images.split(',').map((s) => s.trim()).filter(Boolean),
       }
 
-      const res = await fetch(isEditing ? `/api/admin/products/${params.id}` : '/api/admin/products', {
+      const res = await fetch(isEditing ? `/api/admin/products/${id}` : '/api/admin/products', {
         method: isEditing ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -97,6 +175,10 @@ export default function ProductFormPage() {
     }
   }
 
+  const handleImagesChange = (images: string[]) => {
+    setFormData({ ...formData, images })
+  }
+
   return (
     <div>
       <div className="flex items-center gap-4 mb-8">
@@ -105,12 +187,17 @@ export default function ProductFormPage() {
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            {isEditing ? 'Edit Product' : 'Add New Product'}
+            {fetchingProduct ? 'Loading...' : isEditing ? 'Edit Product' : 'Add New Product'}
           </h1>
           <p className="text-slate-600">Fill in the product details below</p>
         </div>
       </div>
 
+      {fetchingProduct ? (
+        <div className="bg-white rounded-xl shadow-sm p-12 flex items-center justify-center">
+          <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
+        </div>
+      ) : (
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Basic Info */}
@@ -169,7 +256,7 @@ export default function ProductFormPage() {
 
               <Input
                 label="Display"
-                placeholder="e.g., 14.2&quot;"
+                placeholder='e.g., 14.2"'
                 value={formData.displaySize}
                 onChange={(e) => setFormData({ ...formData, displaySize: e.target.value })}
                 required
@@ -183,7 +270,7 @@ export default function ProductFormPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="Price ($)"
+                label="Price (₹)"
                 type="number"
                 placeholder="0.00"
                 value={formData.price}
@@ -192,7 +279,7 @@ export default function ProductFormPage() {
               />
 
               <Input
-                label="Original Price ($)"
+                label="Original Price (₹)"
                 type="number"
                 placeholder="0.00"
                 value={formData.originalPrice}
@@ -275,12 +362,11 @@ export default function ProductFormPage() {
               required
             />
 
-            <Input
-              label="Image URLs (comma separated)"
-              placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+            <ImageUpload
               value={formData.images}
-              onChange={(e) => setFormData({ ...formData, images: e.target.value })}
-              helperText="Enter image URLs separated by commas"
+              onChange={handleImagesChange}
+              label="Product Images"
+              maxImages={5}
             />
           </div>
         </div>
@@ -295,6 +381,7 @@ export default function ProductFormPage() {
           </Button>
         </div>
       </form>
+      )}
     </div>
   )
 }

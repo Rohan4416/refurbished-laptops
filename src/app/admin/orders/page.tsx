@@ -124,7 +124,7 @@ export default function AdminOrdersPage() {
                       <p className="text-sm text-slate-500">{order.user.email}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="font-medium text-slate-900">${order.totalAmount.toFixed(2)}</p>
+                      <p className="font-medium text-slate-900">₹{order.totalAmount.toFixed(0)}</p>
                     </td>
                     <td className="px-6 py-4">
                       <Badge className={getPaymentBadge(order.paymentStatus)} size="sm">

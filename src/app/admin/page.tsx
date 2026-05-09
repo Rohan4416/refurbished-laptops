@@ -5,7 +5,35 @@ import { prisma } from '@/lib/prisma'
 import { FiPackage, FiShoppingCart, FiUsers, FiDollarSign, FiTrendingUp, FiAlertTriangle } from 'react-icons/fi'
 import Link from 'next/link'
 
-async function getStats() {
+interface OrderWithUser {
+  id: string
+  orderNumber: string
+  totalAmount: number
+  orderStatus: string
+  user: {
+    name: string | null
+    email: string
+  }
+}
+
+interface LowStockProduct {
+  id: string
+  brand: string
+  model: string
+  stockQuantity: number
+}
+
+interface Stats {
+  totalProducts: number
+  totalOrders: number
+  totalUsers: number
+  totalRevenue: number
+  recentOrders: OrderWithUser[]
+  lowStockProducts: LowStockProduct[]
+  lowStockCount: number
+}
+
+async function getStats(): Promise<Stats> {
   const [recentOrders, totalUsers, lowStockProducts] = await Promise.all([
     prisma.order.findMany({
       orderBy: { createdAt: 'desc' },
@@ -32,8 +60,8 @@ async function getStats() {
     totalOrders: recentOrders.length,
     totalUsers,
     totalRevenue,
-    recentOrders,
-    lowStockProducts,
+    recentOrders: recentOrders as OrderWithUser[],
+    lowStockProducts: lowStockProducts as LowStockProduct[],
     lowStockCount: lowStockProducts.length,
   }
 }
@@ -51,7 +79,7 @@ export default async function AdminDashboard() {
     { label: 'Total Products', value: stats.totalProducts, icon: FiPackage, color: 'bg-blue-500' },
     { label: 'Total Orders', value: stats.totalOrders, icon: FiShoppingCart, color: 'bg-emerald-500' },
     { label: 'Total Users', value: stats.totalUsers, icon: FiUsers, color: 'bg-purple-500' },
-    { label: 'Total Revenue', value: `$${stats.totalRevenue.toFixed(2)}`, icon: FiDollarSign, color: 'bg-amber-500' },
+    { label: 'Total Revenue', value: `₹${stats.totalRevenue.toFixed(0)}`, icon: FiDollarSign, color: 'bg-amber-500' },
   ]
 
   return (
@@ -93,14 +121,14 @@ export default async function AdminDashboard() {
             {stats.recentOrders.length === 0 ? (
               <div className="p-6 text-center text-slate-500">No orders yet</div>
             ) : (
-              stats.recentOrders.map((order) => (
+              stats.recentOrders.map((order: OrderWithUser) => (
                 <div key={order.id} className="p-4 flex items-center justify-between">
                   <div>
                     <p className="font-medium text-slate-900">{order.orderNumber}</p>
                     <p className="text-sm text-slate-500">{order.user.name || order.user.email}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-slate-900">${order.totalAmount.toFixed(2)}</p>
+                    <p className="font-medium text-slate-900">₹{order.totalAmount.toFixed(0)}</p>
                     <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${
                       order.orderStatus === 'DELIVERED' ? 'bg-emerald-100 text-emerald-700' :
                       order.orderStatus === 'SHIPPED' ? 'bg-blue-100 text-blue-700' :
@@ -135,7 +163,7 @@ export default async function AdminDashboard() {
             {stats.lowStockProducts.length === 0 ? (
               <div className="p-6 text-center text-slate-500">All products are well stocked</div>
             ) : (
-              stats.lowStockProducts.map((product) => (
+              stats.lowStockProducts.map((product: LowStockProduct) => (
                 <div key={product.id} className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <FiAlertTriangle className="w-5 h-5 text-amber-500" />

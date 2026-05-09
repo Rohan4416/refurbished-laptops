@@ -163,7 +163,7 @@ export default function ProfilePage() {
                             <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(order.orderStatus)}`}>
                               {order.orderStatus}
                             </span>
-                            <span className="font-semibold text-slate-900">${order.totalAmount.toFixed(2)}</span>
+                            <span className="font-semibold text-slate-900">₹{order.totalAmount.toLocaleString('en-IN')}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-4">

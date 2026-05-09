@@ -14,7 +14,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "RefurbTech - Certified Refurbished Laptops",
-  description: "Shop certified refurbished laptops with warranty. Quality checked, affordable prices, eco-friendly. Free shipping on orders over $500.",
+  description: "Shop certified refurbished laptops with warranty. Quality checked, affordable prices, eco-friendly. Free shipping on orders over ₹40,000.",
   keywords: ["refurbished laptops", "certified laptops", "used laptops", "refurbished computers", "laptop deals"],
   openGraph: {
     title: "RefurbTech - Certified Refurbished Laptops",

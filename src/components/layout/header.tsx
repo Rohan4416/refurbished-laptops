@@ -37,7 +37,7 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top bar */}
         <div className="hidden md:flex items-center justify-between py-2 text-sm text-slate-500 border-b border-slate-100">
-          <p>Free shipping on orders over $500 | 30-day returns</p>
+          <p>Free shipping on orders over ₹40,000 | 30-day returns</p>
           <div className="flex items-center gap-4">
             <Link href="/about" className="hover:text-blue-600 transition-colors">About Us</Link>
             <span>|</span>

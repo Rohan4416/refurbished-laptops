@@ -8,9 +8,19 @@ export async function GET(
   try {
     const { slug } = await params
 
-    const product = await prisma.product.findUnique({
-      where: { slug },
-    })
+    // Check if it's an ID (24 hex characters) or a slug
+    const isId = /^[a-fA-F0-9]{24}$/.test(slug)
+
+    let product
+    if (isId) {
+      product = await prisma.product.findUnique({
+        where: { id: slug },
+      })
+    } else {
+      product = await prisma.product.findUnique({
+        where: { slug },
+      })
+    }
 
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })

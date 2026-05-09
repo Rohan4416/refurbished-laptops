@@ -159,10 +159,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             {/* Pricing */}
             <div className="bg-slate-50 rounded-xl p-6">
               <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-4xl font-bold text-slate-900">${product.price}</span>
-                <span className="text-xl text-slate-400 line-through">${product.originalPrice}</span>
+                <span className="text-4xl font-bold text-slate-900">₹{product.price.toLocaleString('en-IN')}</span>
+                <span className="text-xl text-slate-400 line-through">₹{product.originalPrice.toLocaleString('en-IN')}</span>
               </div>
-              <p className="text-emerald-600 font-medium">You save ${savings.toFixed(2)} ({savingsPercent}% off)</p>
+              <p className="text-emerald-600 font-medium">You save ₹{savings.toLocaleString('en-IN')} ({savingsPercent}% off)</p>
             </div>
 
             {/* Specs */}

@@ -114,7 +114,7 @@ export default async function HomePage() {
               </div>
               <div>
                 <p className="font-semibold text-slate-900">Free Shipping</p>
-                <p className="text-sm text-slate-500">On orders over $500</p>
+                <p className="text-sm text-slate-500">On orders over ₹40,000</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4">

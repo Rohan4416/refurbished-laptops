@@ -28,8 +28,8 @@ function CheckoutContent() {
   })
 
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
-  const shipping = subtotal >= 500 ? 0 : 49
-  const tax = subtotal * 0.08
+  const shipping = subtotal >= 40000 ? 0 : 4000
+  const tax = subtotal * 0.18
   const total = subtotal + shipping + tax
 
   useEffect(() => {
@@ -268,7 +268,7 @@ function CheckoutContent() {
                         </p>
                         <p className="text-sm text-slate-500">Qty: {item.quantity}</p>
                         <p className="text-sm font-medium text-slate-900">
-                          ${(item.product.price * item.quantity).toFixed(2)}
+                          ₹{(item.product.price * item.quantity).toFixed(0)}
                         </p>
                       </div>
                     </div>
@@ -278,21 +278,21 @@ function CheckoutContent() {
               <div className="border-t border-slate-200 pt-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-600">Subtotal</span>
-                  <span className="font-medium">${subtotal.toFixed(2)}</span>
+                  <span className="font-medium">₹{subtotal.toFixed(0)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-600">Shipping</span>
                   <span className={shipping === 0 ? 'text-emerald-600 font-medium' : ''}>
-                    {shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? 'FREE' : `₹${shipping.toFixed(0)}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Tax (8%)</span>
-                  <span className="font-medium">${tax.toFixed(2)}</span>
+                  <span className="text-slate-600">Tax (18%)</span>
+                  <span className="font-medium">₹{tax.toFixed(0)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold pt-2 border-t border-slate-200">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>₹{total.toFixed(0)}</span>
                 </div>
               </div>
               <Button type="submit" className="w-full mt-6" size="lg" isLoading={loading}>

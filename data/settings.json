@@ -1,0 +1,23 @@
+{
+  "store": {
+    "name": "Refurb",
+    "tagline": "Certified Refurbished Laptops",
+    "email": "support@refurbtech.com",
+    "phone": "+91 9876543210",
+    "address": "123 Tech Street, Mumbai, Maharashtra, India"
+  },
+  "shipping": {
+    "freeThreshold": 80000,
+    "standardCost": 4000,
+    "expressCost": 8000
+  },
+  "tax": {
+    "rate": 18
+  },
+  "social": {
+    "facebook": "",
+    "twitter": "",
+    "instagram": "",
+    "linkedin": ""
+  }
+}

@@ -32,7 +32,7 @@ export function Footer() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-white">Free Shipping</p>
-                <p className="text-xs text-slate-400">On orders over $500</p>
+                <p className="text-xs text-slate-400">On orders over ₹40,000</p>
               </div>
             </div>
             <div className="flex items-center gap-3">

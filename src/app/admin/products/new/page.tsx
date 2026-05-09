@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { FiArrowLeft, FiSave } from 'react-icons/fi'
 import { Button } from '@/components/ui/button'
 import { Input, Select, Textarea } from '@/components/ui/input'
+import { ImageUpload } from '@/components/ui/image-upload'
 import toast from 'react-hot-toast'
 
 const conditionOptions = [
@@ -55,7 +56,7 @@ export default function NewProductPage() {
     stockQuantity: '',
     warranty: '1 Year',
     description: '',
-    images: '',
+    images: [] as string[],
     featured: false,
     isPublished: true,
   })
@@ -71,7 +72,6 @@ export default function NewProductPage() {
         price: parseFloat(formData.price),
         originalPrice: parseFloat(formData.originalPrice),
         stockQuantity: parseInt(formData.stockQuantity),
-        images: formData.images.split(',').map((s) => s.trim()).filter(Boolean),
       }
 
       const res = await fetch('/api/admin/products', {
@@ -92,6 +92,10 @@ export default function NewProductPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleImagesChange = (images: string[]) => {
+    setFormData({ ...formData, images })
   }
 
   return (
@@ -164,7 +168,7 @@ export default function NewProductPage() {
 
               <Input
                 label="Display"
-                placeholder="e.g., 14.2&quot;"
+                placeholder='e.g., 14.2"'
                 value={formData.displaySize}
                 onChange={(e) => setFormData({ ...formData, displaySize: e.target.value })}
                 required
@@ -178,7 +182,7 @@ export default function NewProductPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="Price ($)"
+                label="Price (₹)"
                 type="number"
                 placeholder="0.00"
                 value={formData.price}
@@ -187,7 +191,7 @@ export default function NewProductPage() {
               />
 
               <Input
-                label="Original Price ($)"
+                label="Original Price (₹)"
                 type="number"
                 placeholder="0.00"
                 value={formData.originalPrice}
@@ -270,12 +274,11 @@ export default function NewProductPage() {
               required
             />
 
-            <Input
-              label="Image URLs (comma separated)"
-              placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+            <ImageUpload
               value={formData.images}
-              onChange={(e) => setFormData({ ...formData, images: e.target.value })}
-              helperText="Enter image URLs separated by commas"
+              onChange={handleImagesChange}
+              label="Product Images"
+              maxImages={5}
             />
           </div>
         </div>
