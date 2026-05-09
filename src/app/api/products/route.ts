@@ -79,7 +79,7 @@ export async function GET(request: Request) {
     })
 
     // Parse images JSON
-    const parsedProducts = products.map((p) => ({
+    const parsedProducts = products.map((p: typeof products[0]) => ({
       ...p,
       images: typeof p.images === 'string' ? JSON.parse(p.images) : p.images,
     }))
