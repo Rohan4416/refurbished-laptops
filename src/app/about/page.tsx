@@ -13,7 +13,7 @@ export default function AboutPage() {
               About RefurbTech
             </h1>
             <p className="text-xl text-slate-300 mb-8">
-              We're on a mission to make premium technology accessible while reducing electronic waste. Every laptop we sell undergoes rigorous testing to ensure quality and performance.
+              We&apos;re on a mission to make premium technology accessible while reducing electronic waste. Every laptop we sell undergoes rigorous testing to ensure quality and performance.
             </p>
             <Link href="/shop">
               <Button size="lg">
@@ -31,13 +31,13 @@ export default function AboutPage() {
             <div>
               <h2 className="text-3xl font-bold text-slate-900 mb-6">Our Story</h2>
               <p className="text-slate-600 mb-4">
-                Founded in 2020, RefurbTech began with a simple idea: premium laptops shouldn't come with premium prices. We saw an opportunity to bridge the gap between affordable computing and sustainable technology.
+                Founded in 2020, RefurbTech began with a simple idea: premium laptops shouldn&apos;t come with premium prices. We saw an opportunity to bridge the gap between affordable computing and sustainable technology.
               </p>
               <p className="text-slate-600 mb-4">
                 Our team of certified technicians inspects every device through a comprehensive 30-point quality checklist. We replace worn components, update software, and ensure each laptop performs like new before it reaches your desk.
               </p>
-              <p className="text-slate-600">
-                By choosing refurbished, you're not just saving money—you're also reducing e-waste and contributing to a more sustainable future. Every laptop we refurbish is one less device ending up in landfills.
+              <p className="text-slate-600 mb-4">
+                By choosing refurbished, you&apos;re not just saving money—you&apos;re also reducing e-waste and contributing to a more sustainable future. Every laptop we refurbish is one less device ending up in landfills.
               </p>
             </div>
             <div className="bg-slate-100 rounded-2xl p-8">

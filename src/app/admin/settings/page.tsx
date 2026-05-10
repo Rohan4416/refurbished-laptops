@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { FiSave, FiShoppingBag, FiTruck, FiPercent, FiShare2, FiMail, FiPhone, FiMapPin } from 'react-icons/fi'
+import { useState, useEffect, useCallback } from 'react'
+import { FiSave, FiShoppingBag, FiTruck, FiPercent, FiShare2 } from 'react-icons/fi'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import toast from 'react-hot-toast'
@@ -29,6 +29,8 @@ interface Settings {
     linkedin: string
   }
 }
+
+type TabId = 'store' | 'shipping' | 'tax' | 'social'
 
 const defaultSettings: Settings = {
   store: {
@@ -58,13 +60,9 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [settings, setSettings] = useState<Settings>(defaultSettings)
-  const [activeTab, setActiveTab] = useState<'store' | 'shipping' | 'tax' | 'social'>('store')
+  const [activeTab, setActiveTab] = useState<TabId>('store')
 
-  useEffect(() => {
-    fetchSettings()
-  }, [])
-
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     try {
       setFetching(true)
       const res = await fetch('/api/admin/settings')
@@ -72,12 +70,17 @@ export default function AdminSettingsPage() {
         const data = await res.json()
         setSettings({ ...defaultSettings, ...data })
       }
-    } catch (error) {
-      console.error('Failed to fetch settings:', error)
+    } catch {
+      console.error('Failed to fetch settings')
     } finally {
       setFetching(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchSettings()
+  }, [fetchSettings])
 
   const handleSave = async () => {
     setLoading(true)
@@ -93,7 +96,7 @@ export default function AdminSettingsPage() {
       } else {
         toast.error('Failed to save settings')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to save settings')
     } finally {
       setLoading(false)
@@ -128,7 +131,7 @@ export default function AdminSettingsPage() {
     })
   }
 
-  const tabs = [
+  const tabs: { id: TabId; label: string; icon: typeof FiShoppingBag }[] = [
     { id: 'store', label: 'Store Info', icon: FiShoppingBag },
     { id: 'shipping', label: 'Shipping', icon: FiTruck },
     { id: 'tax', label: 'Tax', icon: FiPercent },
@@ -163,7 +166,7 @@ export default function AdminSettingsPage() {
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
                   ? 'border-blue-600 text-blue-600'

@@ -4,18 +4,22 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { readFile, writeFile } from 'fs/promises'
 import path from 'path'
 
+interface Settings {
+  [key: string]: unknown;
+}
+
 const SETTINGS_FILE = path.join(process.cwd(), 'data', 'settings.json')
 
-async function getSettings() {
+async function getSettings(): Promise<Settings> {
   try {
     const data = await readFile(SETTINGS_FILE, 'utf-8')
     return JSON.parse(data)
-  } catch (error) {
+  } catch {
     return {}
   }
 }
 
-async function saveSettings(settings: any) {
+async function saveSettings(settings: Settings): Promise<void> {
   await writeFile(SETTINGS_FILE, JSON.stringify(settings, null, 2))
 }
 

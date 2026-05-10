@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Image from 'next/image'
-import { FiUpload, FiX, FiImage } from 'react-icons/fi'
+import { FiUpload, FiX } from 'react-icons/fi'
 
 interface ImageUploadProps {
   value: string[]
@@ -52,7 +52,7 @@ export function ImageUpload({ value = [], onChange, label = 'Images', maxImages 
       if (newImages.length > 0) {
         onChange([...value, ...newImages])
       }
-    } catch (err) {
+    } catch {
       setError('Failed to upload images')
     } finally {
       setUploading(false)

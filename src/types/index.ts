@@ -37,7 +37,7 @@ export interface Product {
   price: number
   originalPrice: number
   stockQuantity: number
-  images: string[]
+  images: string[] | string
   description: string
   warranty: string
   processorBrand: string

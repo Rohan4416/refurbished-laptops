@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect, use, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { FiCheck, FiShield, FiRefreshCw, FiTruck, FiHeart, FiMinus, FiPlus } from 'react-icons/fi'
@@ -28,6 +28,9 @@ interface Product {
   warranty: string
   processorBrand: string
   featured: boolean
+  isPublished: boolean
+  createdAt: Date
+  updatedAt: Date
 }
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -40,26 +43,29 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
   const { addItem } = useCartStore()
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const res = await fetch(`/api/products/${slug}`)
-        if (!res.ok) throw new Error('Product not found')
-        const data = await res.json()
-        setProduct(data.product)
-      } catch (error) {
-        console.error('Failed to fetch product:', error)
-      } finally {
-        setLoading(false)
-      }
+  const fetchProduct = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/products/${slug}`)
+      if (!res.ok) throw new Error('Product not found')
+      const data = await res.json()
+      setProduct(data.product)
+    } catch {
+      console.error('Failed to fetch product')
+    } finally {
+      setLoading(false)
     }
-
-    if (slug) fetchProduct()
   }, [slug])
 
-  const handleAddToCart = () => {
+  useEffect(() => {
+    if (slug) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      fetchProduct()
+    }
+  }, [slug, fetchProduct])
+
+  const addProductToCart = () => {
     if (!product) return
-    addItem(product as any, quantity)
+    addItem(product, quantity)
     toast.success(`${product.brand} ${product.model} added to cart!`)
   }
 
@@ -222,7 +228,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               </div>
 
               <div className="flex gap-4">
-                <Button size="lg" className="flex-1" onClick={handleAddToCart}>
+                <Button size="lg" className="flex-1" onClick={addProductToCart}>
                   Add to Cart
                 </Button>
                 <Button variant="outline" size="lg" onClick={handleWishlist}>

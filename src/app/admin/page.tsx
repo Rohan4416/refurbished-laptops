@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/prisma'
 import { FiPackage, FiShoppingCart, FiUsers, FiDollarSign, FiTrendingUp, FiAlertTriangle } from 'react-icons/fi'
 import Link from 'next/link'
 
@@ -34,6 +34,7 @@ interface Stats {
 }
 
 async function getStats(): Promise<Stats> {
+  const prisma = await createPrismaClient()
   const [recentOrders, totalUsers, lowStockProducts] = await Promise.all([
     prisma.order.findMany({
       orderBy: { createdAt: 'desc' },

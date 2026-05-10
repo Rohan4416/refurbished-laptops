@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { FiPlus, FiSearch, FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { FiPlus, FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -31,11 +31,7 @@ export default function AdminProductsPage() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  useEffect(() => {
-    fetchProducts()
-  }, [page, search])
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
@@ -46,12 +42,17 @@ export default function AdminProductsPage() {
       const data = await res.json()
       setProducts(data.products || [])
       setTotalPages(data.totalPages || 1)
-    } catch (error) {
+    } catch {
       toast.error('Failed to fetch products')
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, search])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchProducts()
+  }, [fetchProducts])
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return
@@ -64,7 +65,7 @@ export default function AdminProductsPage() {
       } else {
         toast.error('Failed to delete product')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete product')
     }
   }
@@ -80,7 +81,7 @@ export default function AdminProductsPage() {
         toast.success(`Product ${currentStatus ? 'unpublished' : 'published'} successfully`)
         fetchProducts()
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to update product')
     }
   }

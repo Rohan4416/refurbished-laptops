@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, use } from 'react'
 import { useRouter } from 'next/navigation'
-import { use } from 'react'
 import Link from 'next/link'
 import { FiArrowLeft, FiSave } from 'react-icons/fi'
 import { Button } from '@/components/ui/button'
@@ -90,13 +89,7 @@ export default function ProductFormPage({ params }: PageProps) {
     isPublished: true,
   })
 
-  useEffect(() => {
-    if (isEditing && id) {
-      fetchProduct(id)
-    }
-  }, [isEditing, id])
-
-  const fetchProduct = async (productId: string) => {
+  const fetchProduct = useCallback(async (productId: string) => {
     try {
       setFetchingProduct(true)
       const res = await fetch(`/api/admin/products/${productId}`)
@@ -133,14 +126,21 @@ export default function ProductFormPage({ params }: PageProps) {
         toast.error('Failed to load product')
         router.push('/admin/products')
       }
-    } catch (error) {
-      console.error('Error fetching product:', error)
+    } catch {
+      console.error('Error fetching product')
       toast.error('Failed to load product')
       router.push('/admin/products')
     } finally {
       setFetchingProduct(false)
     }
-  }
+  }, [router])
+
+  useEffect(() => {
+    if (isEditing && id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      fetchProduct(id)
+    }
+  }, [isEditing, id, fetchProduct])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -168,7 +168,7 @@ export default function ProductFormPage({ params }: PageProps) {
         const data = await res.json()
         toast.error(data.error || 'Failed to save product')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to save product')
     } finally {
       setLoading(false)

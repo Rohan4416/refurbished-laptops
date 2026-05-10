@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createPrismaClient } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
 export async function GET(request: Request) {
   try {
@@ -8,7 +9,7 @@ export async function GET(request: Request) {
     const limit = 10
     const search = searchParams.get('search')
 
-    const where: any = {}
+    const where: Prisma.ProductWhereInput = {}
     if (search) {
       where.OR = [
         { brand: { contains: search } },

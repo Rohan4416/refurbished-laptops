@@ -7,6 +7,7 @@ import { ProductCard, ProductCardSkeleton } from '@/components/product/product-c
 import { Button } from '@/components/ui/button'
 import { Input, Select } from '@/components/ui/input'
 import { ConditionBadge } from '@/components/ui/badge'
+import { Product } from '@/types'
 
 const brands = ['Apple', 'Dell', 'HP', 'Lenovo', 'ASUS', 'Microsoft', 'Other']
 const ramOptions = ['8GB', '16GB', '32GB', '64GB']
@@ -26,7 +27,7 @@ const sortOptions = [
 
 function ShopContent() {
   const searchParams = useSearchParams()
-  const [products, setProducts] = useState<any[]>([])
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({

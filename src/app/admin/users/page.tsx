@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { FiSearch, FiEdit, FiUser, FiMail, FiCalendar, FiShoppingBag } from 'react-icons/fi'
 import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 import toast from 'react-hot-toast'
 
 interface UserData {
@@ -26,11 +27,7 @@ export default function AdminUsersPage() {
   const [totalUsers, setTotalUsers] = useState(0)
   const [editingUser, setEditingUser] = useState<UserData | null>(null)
 
-  useEffect(() => {
-    fetchUsers()
-  }, [currentPage, searchQuery])
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true)
       const res = await fetch(`/api/admin/users?page=${currentPage}&search=${searchQuery}`)
@@ -41,13 +38,17 @@ export default function AdminUsersPage() {
         setTotalPages(data.totalPages || 1)
         setTotalUsers(data.totalUsers || 0)
       }
-    } catch (error) {
-      console.error('Failed to fetch users:', error)
-      toast.error('Failed to load users')
+    } catch {
+      console.error('Failed to fetch users')
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentPage, searchQuery])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchUsers()
+  }, [fetchUsers])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -72,7 +73,7 @@ export default function AdminUsersPage() {
         const data = await res.json()
         toast.error(data.error || 'Failed to update role')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to update user role')
     }
   }
@@ -161,9 +162,9 @@ export default function AdminUsersPage() {
                   <tr key={user.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center overflow-hidden">
                           {user.image ? (
-                            <img src={user.image} alt="" className="w-10 h-10 rounded-full" />
+                            <Image src={user.image} alt="" width={40} height={40} className="w-10 h-10 rounded-full object-cover" />
                           ) : (
                             <FiUser className="w-5 h-5 text-slate-500" />
                           )}

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { FiSearch, FiEye, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { useState, useEffect, useCallback } from 'react'
+import { FiEye, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import toast from 'react-hot-toast'
@@ -22,23 +22,24 @@ export default function AdminOrdersPage() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  useEffect(() => {
-    fetchOrders()
-  }, [page])
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch(`/api/admin/orders?page=${page}`)
       const data = await res.json()
       setOrders(data.orders || [])
       setTotalPages(data.totalPages || 1)
-    } catch (error) {
+    } catch {
       toast.error('Failed to fetch orders')
     } finally {
       setLoading(false)
     }
-  }
+  }, [page])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchOrders()
+  }, [fetchOrders])
 
   const updateStatus = async (orderId: string, status: string) => {
     try {
@@ -51,7 +52,7 @@ export default function AdminOrdersPage() {
         toast.success('Order status updated')
         fetchOrders()
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to update order')
     }
   }

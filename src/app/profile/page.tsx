@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { FiUser, FiPackage, FiMapPin, FiCreditCard, FiLogOut, FiShoppingBag } from 'react-icons/fi'
+import { FiUser, FiPackage, FiShoppingBag } from 'react-icons/fi'
 import { Button } from '@/components/ui/button'
-import toast from 'react-hot-toast'
 
 interface Order {
   id: string
@@ -19,12 +18,24 @@ interface Order {
   items: { quantity: number; price: number; product: { brand: string; model: string; images: string } }[]
 }
 
-export default function ProfilePage() {
+function ProfileContent() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'orders' | 'settings'>('orders')
+
+  const fetchOrders = useCallback(async () => {
+    try {
+      const res = await fetch('/api/orders')
+      const data = await res.json()
+      setOrders(data.orders || [])
+    } catch {
+      console.error('Failed to fetch orders')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -34,21 +45,10 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (session?.user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchOrders()
     }
-  }, [session])
-
-  const fetchOrders = async () => {
-    try {
-      const res = await fetch('/api/orders')
-      const data = await res.json()
-      setOrders(data.orders || [])
-    } catch (error) {
-      console.error('Failed to fetch orders:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [session, fetchOrders])
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -223,5 +223,17 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
+      </div>
+    }>
+      <ProfileContent />
+    </Suspense>
   )
 }

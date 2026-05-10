@@ -1,37 +1,14 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { FiShield, FiRefreshCw, FiTruck, FiHeadphones, FiCheck } from 'react-icons/fi'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/prisma'
 import { ProductCard } from '@/components/product/product-card'
 import { Button } from '@/components/ui/button'
 
 export const dynamic = 'force-dynamic'
 
-interface ProductType {
-  id: string
-  brand: string
-  model: string
-  slug: string
-  processor: string
-  ram: string
-  storage: string
-  displaySize: string
-  conditionGrade: string
-  batteryHealth: number
-  price: number
-  originalPrice: number
-  stockQuantity: number
-  images: string
-  description: string
-  warranty: string
-  processorBrand: string
-  isPublished: boolean
-  featured: boolean
-  createdAt: Date
-  updatedAt: Date
-}
-
 async function getFeaturedProducts() {
+  const prisma = await createPrismaClient()
   const products = await prisma.product.findMany({
     where: { featured: true, isPublished: true, stockQuantity: { gt: 0 } },
     take: 4,
@@ -40,6 +17,7 @@ async function getFeaturedProducts() {
 }
 
 async function getLatestProducts() {
+  const prisma = await createPrismaClient()
   const products = await prisma.product.findMany({
     where: { isPublished: true, stockQuantity: { gt: 0 } },
     orderBy: { createdAt: 'desc' },
@@ -169,8 +147,8 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product: ProductType) => (
-              <ProductCard key={product.id} product={product as any} />
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>
@@ -224,8 +202,8 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {latestProducts.map((product: ProductType) => (
-              <ProductCard key={product.id} product={product as any} />
+            {latestProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>

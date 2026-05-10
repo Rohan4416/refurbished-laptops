@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { useEffect, useState, Suspense } from 'react'
+import { Suspense } from 'react'
 import { FiHome, FiPackage, FiShoppingCart, FiUsers, FiSettings, FiLogOut } from 'react-icons/fi'
 import { signOut } from 'next-auth/react'
 
@@ -19,17 +19,6 @@ function AdminContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const router = useRouter()
   const pathname = usePathname()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  useEffect(() => {
-    if (mounted && status === 'unauthenticated') {
-      router.push('/auth/login?callbackUrl=/admin')
-    }
-  }, [mounted, status, router])
 
   if (status === 'loading') {
     return (
@@ -40,6 +29,9 @@ function AdminContent({ children }: { children: React.ReactNode }) {
   }
 
   if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login?callbackUrl=/admin')
+    }
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100">
         <div className="text-center">

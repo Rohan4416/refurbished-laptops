@@ -87,7 +87,7 @@ export default function NewProductPage() {
         const data = await res.json()
         toast.error(data.error || 'Failed to create product')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to create product')
     } finally {
       setLoading(false)
